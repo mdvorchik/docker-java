@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: '123qwe'
+  data-filler:
+    build: ./DataFiller
+    container_name: data-filler
+    # ./DataFiller/data contans csv with name CSV_FILE_NAME 
+    volumes:
+      - './DataFiller/data:/opt/app/data'
+    environment:
+      SERVICE_PRECONDITION: "db:5432"
+      CSV_FILE_NAME: "some-data.csv"
+      DB_USER: "postgres"
+      DB_PASSWORD: '123qwe'
+  data-getter:
+    build: ./DataGetter
+    container_name: data-getter
+    environment:
+      SERVICE_PRECONDITION: "db:5432"
+      DB_USER: "postgres"
+      DB_PASSWORD: '123qwe'
+    ports:
+      - 11105:8080
